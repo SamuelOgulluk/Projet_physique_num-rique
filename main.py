@@ -128,6 +128,61 @@ def plot_distribution_at_time(results, t_index=None, bins=80):
 	plt.show()
 
 
+def simulate_harmonic_potential(n_trajectories, n_steps, dt, D, k, gamma, seed=0):
+	"""Simule x(t) pour une particule soumise à un potentiel harmonique en 1D."""
+	rng = np.random.default_rng(seed)
+	x = np.zeros((n_trajectories, n_steps + 1))
+	noise_scale = np.sqrt(2.0 * D * dt)
+
+	for i in range(n_steps):
+		noise = noise_scale * rng.standard_normal(n_trajectories)
+		drift = -(k / gamma) * x[:, i] * dt
+		x[:, i + 1] = x[:, i] + drift + noise
+
+	t = np.arange(n_steps + 1) * dt
+	return t, x
+
+
+def plot_harmonic_analysis(t, x, D, k, gamma, bins=80):
+	fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+	ax_var, ax_dist = axes
+
+	
+	var_t = np.var(x, axis=0)
+
+	ax_var.plot(t, var_t, label=f"Variance mesurée (D={D}, gamma={gamma})", color="blue")
+	ax_var.set_title(f"Évolution de la variance")
+	ax_var.set_xlabel("Temps t")
+	ax_var.set_ylabel("Var[x(t)]")
+	ax_var.grid(True, alpha=0.3)
+	ax_var.legend()
+
+	x_final = x[:, -1]
+
+	# Mesure expérimentale directe sur les données
+	mean_sim = np.mean(x_final)
+	var_sim = np.var(x_final)
+
+	# Affichage de l'histogramme des données
+	ax_dist.hist(x_final, bins=bins, density=True, alpha=0.65, color="blue", label="Données simulées")
+
+	# Construction de la gaussienne avec la variance mesurée
+	x_grid = np.linspace(x_final.min(), x_final.max(), 400)
+	pdf_fit = (1.0 / np.sqrt(2 * np.pi * var_sim)) * np.exp(-((x_grid - mean_sim) ** 2) / (2 * var_sim))
+
+	ax_dist.plot(x_grid, pdf_fit, "r-", lw=2, label=f"Fit Gaussien (Var={var_sim:.3f})")
+	ax_dist.set_title(f"Distribution finale et son Fit")
+	ax_dist.set_xlabel("Position x")
+	ax_dist.set_ylabel("P(x)")
+	ax_dist.grid(True, alpha=0.3)
+	ax_dist.legend()
+
+	plt.tight_layout()
+	plt.show()
+
+	return var_sim
+
+
 def main():
 	# Paramètres de simulation
 	D_values = [0.25, 0.5, 1.0]
@@ -139,6 +194,17 @@ def main():
 	print_summary(results)
 	plot_time_statistics(results)
 	plot_distribution_at_time(results, t_index=800)
+
+	# Potentiel Harmonique
+	k = 1.0
+	gamma_values = [1.0, 2.0]
+
+	for D in D_values:
+		for gamma in gamma_values:
+			t_harm, x_harm = simulate_harmonic_potential(n_trajectories, n_steps, dt, D, k, gamma)
+			var_mesuree = plot_harmonic_analysis(t_harm, x_harm, D, k, gamma)
+			print(f"Résultat expérimental -> D={D}, gamma={gamma} | Variance mesurée = {var_mesuree:.4f}")
+
 
 if __name__ == "__main__":
 	main()
