@@ -219,6 +219,8 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 	a_double = 0.4
 	b_double = 1.2
 
+	evolution_time_indices = [0, 1, 3, 10, 30, 100, 300, 1000]
+
 	t_g, x_g = simulate_with_force(
 		n_trajectories=n_trajectories,
 		n_steps=n_steps_force,
@@ -226,11 +228,16 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		D=D_force,
 		gamma=gamma_force,
 		force_fn=lambda x: force_gravity(x, mg),
-		x0=2.0,
+		x0=4.0,
 		seed=7,
 		reflect_min=0.0,
 	)
-	plot_distribution_evolution(t_g, x_g, "Pesanteur + fond reflechissant: evolution de P(z,t)")
+	plot_distribution_evolution(
+		t_g,
+		x_g,
+		"Pesanteur + fond reflechissant: evolution de P(z,t)",
+		time_indices=evolution_time_indices,
+	)
 	err_g = plot_stationary_vs_boltzmann(
 		x_final=x_g[:, -1],
 		potential_fn=lambda z: potential_gravity(z, mg),
@@ -255,7 +262,12 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		x0=0.1,
 		seed=11,
 	)
-	plot_distribution_evolution(t_s, x_s, "Puits simple V(x)=a x^4: evolution de P(x,t)")
+	plot_distribution_evolution(
+		t_s,
+		x_s,
+		"Puits simple V(x)=a x^4: evolution de P(x,t)",
+		time_indices=evolution_time_indices,
+	)
 	err_s = plot_stationary_vs_boltzmann(
 		x_final=x_s[:, -1],
 		potential_fn=lambda x: potential_single_well(x, a_single),
@@ -275,7 +287,12 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		x0=0.0,
 		seed=19,
 	)
-	plot_distribution_evolution(t_d, x_d, "Double puits: evolution de P(x,t)")
+	plot_distribution_evolution(
+		t_d,
+		x_d,
+		"Double puits: evolution de P(x,t)",
+		time_indices=evolution_time_indices,
+	)
 	err_d = plot_stationary_vs_boltzmann(
 		x_final=x_d[:, -1],
 		potential_fn=lambda x: potential_double_well(x, a_double, b_double),
