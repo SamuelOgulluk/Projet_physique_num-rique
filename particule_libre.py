@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+PLOT_LINEWIDTH = 2.2
+LEGEND_FONTSIZE = 11
+TITLE_FONTSIZE = 16
+AXIS_LABEL_FONTSIZE = 13
+TICK_LABEL_FONTSIZE = 11
 
 def simulate_free_particle(n_trajectories, n_steps, dt, D, seed=0):
 	"""Simule x(t) pour une particule libre en 1D: dx = sqrt(2D) dW."""
@@ -35,7 +40,6 @@ def analyze_D_values(D_values, n_trajectories=20000, n_steps=1000, dt=0.01):
 
 
 def print_summary(results):
-	print("=== Resume statistique (particule libre, diffusion 1D) ===")
 	for D, res in results.items():
 		t = res["t"]
 		mean_t = res["mean"]
@@ -61,29 +65,32 @@ def plot_time_statistics(results):
 		var_t = res["var"]
 		std_t = res["std"]
 
-		ax_mean.plot(t, mean_t, label=f"D={D}")
-		ax_var.plot(t, var_t, label=f"num D={D}")
-		ax_var.plot(t, 2 * D * t, "--", alpha=0.7, label=f"th 2Dt, D={D}")
-		ax_std.plot(t, std_t, label=f"num D={D}")
-		ax_std.plot(t, np.sqrt(2 * D * t), "--", alpha=0.7, label=f"th sqrt(2Dt), D={D}")
+		ax_mean.plot(t, mean_t, lw=PLOT_LINEWIDTH, label=f"D={D}")
+		ax_var.plot(t, var_t, lw=PLOT_LINEWIDTH, label=f"num D={D}")
+		ax_var.plot(t, 2 * D * t, "--", lw=PLOT_LINEWIDTH, alpha=0.7, label=f"th 2Dt, D={D}")
+		ax_std.plot(t, std_t, lw=PLOT_LINEWIDTH, label=f"num D={D}")
+		ax_std.plot(t, np.sqrt(2 * D * t), "--", lw=PLOT_LINEWIDTH, alpha=0.7, label=f"th sqrt(2Dt), D={D}")
 
-	ax_mean.set_title("Moyenne <x(t)>")
-	ax_mean.set_xlabel("t")
-	ax_mean.set_ylabel("<x>")
+	ax_mean.set_title("Moyenne <x(t)>", fontsize=TITLE_FONTSIZE)
+	ax_mean.set_xlabel("t", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_mean.set_ylabel("<x>", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_mean.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax_mean.grid(True, alpha=0.3)
-	ax_mean.legend(fontsize=8)
+	ax_mean.legend(fontsize=LEGEND_FONTSIZE)
 
-	ax_var.set_title("Variance Var[x(t)]")
-	ax_var.set_xlabel("t")
-	ax_var.set_ylabel("Var[x]")
+	ax_var.set_title("Variance Var[x(t)]", fontsize=TITLE_FONTSIZE)
+	ax_var.set_xlabel("t", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_var.set_ylabel("Var[x]", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_var.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax_var.grid(True, alpha=0.3)
-	ax_var.legend(fontsize=8)
+	ax_var.legend(fontsize=LEGEND_FONTSIZE)
 
-	ax_std.set_title("Ecart-type sigma_x(t)")
-	ax_std.set_xlabel("t")
-	ax_std.set_ylabel("sigma_x")
+	ax_std.set_title("Ecart-type sigma_x(t)", fontsize=TITLE_FONTSIZE)
+	ax_std.set_xlabel("t", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_std.set_ylabel("sigma_x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax_std.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax_std.grid(True, alpha=0.3)
-	ax_std.legend(fontsize=8)
+	ax_std.legend(fontsize=LEGEND_FONTSIZE)
 
 	plt.tight_layout()
 	plt.show()
@@ -112,13 +119,14 @@ def plot_distribution_at_time(results, t_index=None, bins=80):
 			if sigma2 > 0
 			else np.zeros_like(x_grid)
 		)
-		ax.plot(x_grid, pdf, "r-", lw=2, label="Theorie gaussienne")
+		ax.plot(x_grid, pdf, "r-", lw=PLOT_LINEWIDTH, label="Theorie gaussienne")
 
-		ax.set_title(f"Distribution a t={t0:.2f}, D={D}")
-		ax.set_xlabel("x")
-		ax.set_ylabel("P(x,t)")
+		ax.set_title(f"Distribution a t={t0:.2f}, D={D}", fontsize=TITLE_FONTSIZE)
+		ax.set_xlabel("x", fontsize=AXIS_LABEL_FONTSIZE)
+		ax.set_ylabel("P(x,t)", fontsize=AXIS_LABEL_FONTSIZE)
+		ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 		ax.grid(True, alpha=0.3)
-		ax.legend(fontsize=8)
+		ax.legend(fontsize=LEGEND_FONTSIZE)
 
 	plt.tight_layout()
 	plt.show()

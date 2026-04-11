@@ -2,8 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+PLOT_LINEWIDTH = 2.2
+LEGEND_FONTSIZE = 11
+TITLE_FONTSIZE = 16
+AXIS_LABEL_FONTSIZE = 13
+TICK_LABEL_FONTSIZE = 11
+
+
 def simulate_harmonic_potential(n_trajectories, n_steps, dt, D, k, gamma, seed=0):
-	"""Simule x(t) pour une particule soumise a un potentiel harmonique en 1D."""
+	"""Simule x(t) pour une particule soumise a un potentiel harmonique en 1D"""
 	rng = np.random.default_rng(seed)
 	x = np.zeros((n_trajectories, n_steps + 1))
 	noise_scale = np.sqrt(2.0 * D * dt)
@@ -49,14 +56,15 @@ def plot_harmonic_variances(harmonic_results, k):
 		var_t = res["var_t"]
 		var_theory = (D * gamma / k) * (1 - np.exp(-2 * k * t / gamma))
 
-		ax.plot(t, var_t, label=f"num D={D}, gamma={gamma}")
-		ax.plot(t, var_theory, "--", alpha=0.75, label=f"th D={D}, gamma={gamma}")
+		ax.plot(t, var_t, lw=PLOT_LINEWIDTH, label=f"num D={D}, gamma={gamma}")
+		ax.plot(t, var_theory, "--", lw=PLOT_LINEWIDTH, alpha=0.75, label=f"th D={D}, gamma={gamma}")
 
-	ax.set_title("Potentiel harmonique: variances temporelles")
-	ax.set_xlabel("Temps t")
-	ax.set_ylabel("Var[x(t)]")
+	ax.set_title("Potentiel harmonique: variances temporelles", fontsize=TITLE_FONTSIZE)
+	ax.set_xlabel("Temps t", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.set_ylabel("Var[x(t)]", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax.grid(True, alpha=0.3)
-	ax.legend(fontsize=8, ncol=2)
+	ax.legend(fontsize=LEGEND_FONTSIZE, ncol=2)
 	plt.tight_layout()
 	plt.show()
 
@@ -74,20 +82,21 @@ def plot_harmonic_gaussians(harmonic_results, bins=80):
 			bins=bins,
 			density=True,
 			histtype="step",
-			lw=1.3,
+			lw=PLOT_LINEWIDTH,
 			alpha=0.9,
 			label=f"hist D={D}, gamma={gamma}",
 		)
 
 		x_grid = np.linspace(x_final.min(), x_final.max(), 400)
 		pdf_fit = (1.0 / np.sqrt(2 * np.pi * var_sim)) * np.exp(-((x_grid - mean_sim) ** 2) / (2 * var_sim))
-		ax.plot(x_grid, pdf_fit, lw=2, label=f"gauss D={D}, gamma={gamma}")
+		ax.plot(x_grid, pdf_fit, lw=PLOT_LINEWIDTH, label=f"gauss D={D}, gamma={gamma}")
 
-	ax.set_title("Potentiel harmonique: distributions finales et fits gaussiens")
-	ax.set_xlabel("Position x")
-	ax.set_ylabel("P(x)")
+	ax.set_title("Potentiel harmonique: distributions finales et fits gaussiens", fontsize=TITLE_FONTSIZE)
+	ax.set_xlabel("Position x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.set_ylabel("P(x)", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax.grid(True, alpha=0.3)
-	ax.legend(fontsize=8, ncol=2)
+	ax.legend(fontsize=LEGEND_FONTSIZE, ncol=2)
 	plt.tight_layout()
 	plt.show()
 
@@ -138,20 +147,56 @@ def potential_double_well(x, a, b):
 	return a * (x**2 - b**2) ** 2
 
 
-def plot_distribution_evolution(t, x, title, time_indices=None, bins=90):
+def plot_potential_wells(a_single, a_double, b_double, xlim=2.0):
+	"""Petit plot des potentiels de puits (simple et double)"""
+	x = np.linspace(-xlim, xlim, 500)
+	v_single = potential_single_well(x, a_single)
+	v_double = potential_double_well(x, a_double, b_double)
+
+	fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
+
+	ax1, ax2 = axes
+	ax1.plot(x, v_single, lw=PLOT_LINEWIDTH)
+	ax1.set_title("Puits simple V(x)=a x^4", fontsize=TITLE_FONTSIZE - 1)
+	ax1.set_xlabel("x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax1.set_ylabel("V(x)", fontsize=AXIS_LABEL_FONTSIZE)
+	ax1.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
+	ax1.grid(True, alpha=0.3)
+
+	ax2.plot(x, v_double, lw=PLOT_LINEWIDTH)
+	ax2.set_title("Double puits V(x)=a(x^2-b^2)^2", fontsize=TITLE_FONTSIZE - 1)
+	ax2.set_xlabel("x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax2.set_ylabel("V(x)", fontsize=AXIS_LABEL_FONTSIZE)
+	ax2.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
+	ax2.grid(True, alpha=0.3)
+
+	plt.tight_layout()
+	plt.show()
+
+
+def plot_distribution_evolution(t, x, title, time_indices=None, bins=90, figsize=(12, 7)):
 	if time_indices is None:
 		time_indices = [len(t) // 10, len(t) // 3, 2 * len(t) // 3, len(t) - 1]
 
-	fig, ax = plt.subplots(figsize=(9, 5))
+	fig, ax = plt.subplots(figsize=figsize)
 	for idx in time_indices:
 		xs = x[:, idx]
-		ax.hist(xs, bins=bins, density=True, histtype="step", lw=1.8, alpha=0.9, label=f"t={t[idx]:.2f}")
+		ax.hist(
+			xs,
+			bins=bins,
+			density=True,
+			histtype="step",
+			lw=PLOT_LINEWIDTH,
+			alpha=0.9,
+			label=f"t={t[idx]:.2f}",
+		)
 
-	ax.set_title(title)
-	ax.set_xlabel("x")
-	ax.set_ylabel("P(x,t)")
+	ax.set_title(title, fontsize=TITLE_FONTSIZE)
+	ax.set_xlabel("x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.set_ylabel("P(x,t)", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax.grid(True, alpha=0.3)
-	ax.legend()
+	ax.legend(fontsize=LEGEND_FONTSIZE)
 	plt.tight_layout()
 	plt.show()
 
@@ -180,12 +225,13 @@ def plot_stationary_vs_boltzmann(x_final, potential_fn, D, gamma, title, bins=90
 
 	fig, ax = plt.subplots(figsize=(9, 5))
 	ax.hist(x_final, bins=bins, density=True, alpha=0.6, label="Simulation stationnaire")
-	ax.plot(x_grid, p_boltz, "r-", lw=2.2, label="Boltzmann predite")
-	ax.set_title(title)
-	ax.set_xlabel("x")
-	ax.set_ylabel("P_st(x)")
+	ax.plot(x_grid, p_boltz, "r-", lw=PLOT_LINEWIDTH, label="Boltzmann predite")
+	ax.set_title(title, fontsize=TITLE_FONTSIZE)
+	ax.set_xlabel("x", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.set_ylabel("P_st(x)", fontsize=AXIS_LABEL_FONTSIZE)
+	ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 	ax.grid(True, alpha=0.3)
-	ax.legend()
+	ax.legend(fontsize=LEGEND_FONTSIZE)
 	plt.tight_layout()
 	plt.show()
 
@@ -208,9 +254,9 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 	plot_harmonic_gaussians(harmonic_results, bins=80)
 
 	for (D, gamma), res in harmonic_results.items():
-		print(f"Resultat experimental -> D={D}, gamma={gamma} | Variance mesuree = {res['var_final']:.4f}")
+		print(f"Resultat experimental : D={D}, gamma={gamma} | Variance mesuree = {res['var_final']:.4f}")
 
-	print("\n=== Evolution de P(x,t) sous force exterieure et test de Boltzmann ===")
+	print("\n Evolution de P(x,t) sous force exterieure et test de Boltzmann")
 	D_force = 0.5
 	gamma_force = 1.0
 	n_steps_force = 4000
@@ -218,6 +264,7 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 	a_single = 0.25
 	a_double = 0.4
 	b_double = 1.2
+	plot_potential_wells(a_single=a_single, a_double=a_double, b_double=b_double)
 
 	evolution_time_indices = [0, 1, 3, 10, 30, 100, 300, 1000]
 
@@ -237,6 +284,7 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		x_g,
 		"Pesanteur + fond reflechissant: evolution de P(z,t)",
 		time_indices=evolution_time_indices,
+		figsize=(14, 8),
 	)
 	err_g = plot_stationary_vs_boltzmann(
 		x_final=x_g[:, -1],
@@ -248,9 +296,9 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 	)
 	lambda_th = gamma_force * D_force / mg
 	mean_z = np.mean(x_g[:, -1])
-	print(f"Pesanteur -> erreur L2(sim, Boltzmann) = {err_g:.4e}")
-	print(f"Pesanteur -> longueur caracteristique theorique lambda = gamma*D/mg = {lambda_th:.4f}")
-	print(f"Pesanteur -> moyenne stationnaire simulee <z> = {mean_z:.4f} (attendu ~ lambda)")
+	print(f"Pesanteur : erreur L2(sim, Boltzmann) = {err_g:.4e}")
+	print(f"Pesanteur : longueur caracteristique theorique lambda = gamma*D/mg = {lambda_th:.4f}")
+	print(f"Pesanteur : moyenne stationnaire simulee <z> = {mean_z:.4f}")
 
 	t_s, x_s = simulate_with_force(
 		n_trajectories=n_trajectories,
@@ -275,7 +323,7 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		gamma=gamma_force,
 		title="Puits simple: stationnaire simulee vs Boltzmann",
 	)
-	print(f"Puits simple -> erreur L2(sim, Boltzmann) = {err_s:.4e}")
+	print(f"Puits simple : erreur L2(sim, Boltzmann) = {err_s:.4e}")
 
 	t_d, x_d = simulate_with_force(
 		n_trajectories=n_trajectories,
@@ -300,4 +348,4 @@ def run_external_force_analysis(D_values, n_trajectories=20000, n_steps=1000, dt
 		gamma=gamma_force,
 		title="Double puits: stationnaire simulee vs Boltzmann",
 	)
-	print(f"Double puits -> erreur L2(sim, Boltzmann) = {err_d:.4e}")
+	print(f"Double puits : erreur L2(sim, Boltzmann) = {err_d:.4e}")
