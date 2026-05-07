@@ -70,12 +70,73 @@ def plot_2d_variance(t, r, D):
     plt.tight_layout()
     plt.show()
 
+
+def plot_2d_mean(t, r):
+    """
+    Vérifie que la position moyenne <x(t)> et <y(t)> reste nulle.
+    """
+    x = r[:, 0, :]
+    y = r[:, 1, :]
+    
+    # Moyenne sur l'ensemble des trajectoires (axis=0) pour chaque instant
+    mean_x = np.mean(x, axis=0)
+    mean_y = np.mean(y, axis=0)
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(t, mean_x, lw=PLOT_LINEWIDTH, label="Simulation <x(t)>")
+    ax.plot(t, mean_y, lw=PLOT_LINEWIDTH, label="Simulation <y(t)>")
+    
+    # La ligne théorique à 0
+    ax.plot(t, np.zeros_like(t), 'k--', lw=PLOT_LINEWIDTH, alpha=0.7, label="Théorie (0)")
+    
+    ax.set_title("Moyenne des positions en 2D", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Temps t", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("Position moyenne", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=LEGEND_FONTSIZE)
+    plt.tight_layout()
+    plt.show()
+
+
+
+def plot_2d_std(t, r, D):
+    """
+    Calcule et trace la racine du déplacement quadratique moyen (RMS) en 2D.
+    """
+    x = r[:, 0, :]
+    y = r[:, 1, :]
+    
+    # Calcul de la distance au carré r^2
+    r_squared = x**2 + y**2
+    
+    # Racine de la moyenne spatiale sur toutes les trajectoires
+    rms_r = np.sqrt(np.mean(r_squared, axis=0))
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(t, rms_r, lw=PLOT_LINEWIDTH, label="Simulation $\\sqrt{\\langle r^2 \\rangle}$")
+    
+    # Ligne théorique : racine(4Dt) en 2D
+    ax.plot(t, np.sqrt(4 * D * t), 'k--', lw=PLOT_LINEWIDTH, alpha=0.7, label="Théorie $\\sqrt{4Dt}$")
+    
+    ax.set_title("Écart-type de la distance (RMS) en 2D", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Temps t", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("$\\sqrt{\\langle r^2(t) \\rangle}$", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=LEGEND_FONTSIZE)
+    plt.tight_layout()
+    plt.show()
+
+
+
 def run_2d_analysis(D=0.5, n_trajectories=5000, n_steps=2000, dt=0.01):
     print(f"--- Lancement de l'analyse 2D (D={D}) ---")
     t, r = simulate_2d_free_particle(n_trajectories, n_steps, dt, D)
     
     plot_2d_trajectories(t, r, n_plot=3)
+    plot_2d_mean(t, r)
     plot_2d_variance(t, r, D)
+    plot_2d_std(t, r, D)
+    
 
 if __name__ == "__main__":
     run_2d_analysis()

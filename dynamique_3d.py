@@ -73,12 +73,74 @@ def plot_3d_variance(t, r, D):
     plt.tight_layout()
     plt.show()
 
+
+def plot_3d_mean(t, r):
+    """
+    Vérifie que la position moyenne <x>, <y> et <z> reste nulle en 3D.
+    """
+    x = r[:, 0, :]
+    y = r[:, 1, :]
+    z = r[:, 2, :]
+    
+    # Moyenne sur l'ensemble des particules
+    mean_x = np.mean(x, axis=0)
+    mean_y = np.mean(y, axis=0)
+    mean_z = np.mean(z, axis=0)
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(t, mean_x, lw=PLOT_LINEWIDTH, label="Simulation <x(t)>")
+    ax.plot(t, mean_y, lw=PLOT_LINEWIDTH, label="Simulation <y(t)>")
+    ax.plot(t, mean_z, lw=PLOT_LINEWIDTH, label="Simulation <z(t)>")
+    
+    # ligne théorique à 0
+    ax.plot(t, np.zeros_like(t), 'k--', lw=PLOT_LINEWIDTH, alpha=0.7, label="Théorie (0)")
+    
+    ax.set_title("Moyenne des positions en 3D", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Temps t", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("Position moyenne", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=LEGEND_FONTSIZE)
+    plt.tight_layout()
+    plt.show()
+
+def plot_3d_std(t, r, D):
+    """
+    Calcule et trace la racine du déplacement quadratique moyen (RMS) en 3D.
+    """
+    x = r[:, 0, :]
+    y = r[:, 1, :]
+    z = r[:, 2, :]
+    
+    # Calcul de la distance au carré r^2 en 3D
+    r_squared = x**2 + y**2 + z**2
+    
+    # Racine de la moyenne spatiale sur toutes les trajectoires
+    rms_r = np.sqrt(np.mean(r_squared, axis=0))
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(t, rms_r, lw=PLOT_LINEWIDTH, label="Simulation $\\sqrt{\\langle r^2 \\rangle}$")
+    
+    # Ligne théorique : racine(6Dt) en 3D
+    ax.plot(t, np.sqrt(6 * D * t), 'k--', lw=PLOT_LINEWIDTH, alpha=0.7, label="Théorie $\\sqrt{6Dt}$")
+    
+    ax.set_title("Écart-type de la distance (RMS) en 3D", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Temps t", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("$\\sqrt{\\langle r^2(t) \\rangle}$", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=LEGEND_FONTSIZE)
+    plt.tight_layout()
+    plt.show()
+
 def run_3d_analysis(D=0.5, n_trajectories=5000, n_steps=2000, dt=0.01):
     print(f"--- Lancement de l'analyse 3D (D={D}) ---")
     t, r = simulate_3d_free_particle(n_trajectories, n_steps, dt, D)
     
     plot_3d_trajectories(t, r, n_plot=3)
+    plot_3d_mean(t, r)
     plot_3d_variance(t, r, D)
+    plot_3d_std(t, r, D)
+
+    
 
 if __name__ == "__main__":
     run_3d_analysis()

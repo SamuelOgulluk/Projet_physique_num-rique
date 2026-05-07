@@ -10,7 +10,7 @@ def main():
 	n_steps = 1000
 	dt = 0.01
 
-	"""print("Particule libre")
+	print("Particule libre")
 	run_free_particle_analysis(
 		D_values=D_values,
 		n_trajectories=n_trajectories,
@@ -28,7 +28,7 @@ def main():
 
 	print("\nTemps de franchissement - loi d'Arrhenius")
 	run_eyring_barrier_analysis()
-	run_eyring_D_analysis()"""
+	run_eyring_D_analysis()
 
 	print("\nDynamique en 2D")
 	run_2d_analysis(D=0.5, n_trajectories=10000, n_steps=1000, dt=0.01)
