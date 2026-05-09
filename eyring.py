@@ -40,7 +40,7 @@ def first_passage_times(n_traj, dt, D, gamma, a, b, x_threshold=0.0, max_steps=5
 def run_eyring_barrier_analysis(D=0.3, gamma=1.0, b=1.2, n_traj=3000, dt=0.005):
     """Fait varier la hauteur de barriere DeltaV = a*b^4 a D fixe."""
     a_values = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
-    delta_V = a_values * b**4
+    delta_V = a_values * b**2
 
     mean_times = []
     print("=== Variation de la barriere (D fixe) ===")
@@ -61,7 +61,7 @@ def run_eyring_barrier_analysis(D=0.3, gamma=1.0, b=1.2, n_traj=3000, dt=0.005):
     ax.plot(delta_V, log_t, 'o', ms=7, label="Simulation")
     ax.plot(delta_V, np.polyval(coeffs, delta_V), '--', lw=2,
             label=f"Fit : pente = {slope:.3f}\nThéorie : {1/(D*gamma):.3f}")
-    ax.set_xlabel(r"$\Delta V = a b^4$")
+    ax.set_xlabel(r"$\Delta V = a b^2$")
     ax.set_ylabel(r"$\ln\langle t \rangle$")
     ax.set_title(r"Loi d'Arrhenius : $\ln\langle t\rangle$ vs $\Delta V$ ($D$ fixé)")
     ax.grid(True, alpha=0.3)
@@ -74,7 +74,7 @@ def run_eyring_barrier_analysis(D=0.3, gamma=1.0, b=1.2, n_traj=3000, dt=0.005):
 def run_eyring_D_analysis(a=0.4, gamma=1.0, b=1.2, n_traj=3000, dt=0.005):
     """Fait varier D a barriere fixe."""
     D_values = np.array([0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6])
-    delta_V = a * b**4
+    delta_V = a * b**2
 
     mean_times = []
     print("\n=== Variation de D (barriere fixe) ===")
