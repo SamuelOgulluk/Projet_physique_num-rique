@@ -50,6 +50,7 @@ def run_eyring_analysis(gamma=1.0, b=1.2, n_traj=500, dt=0.005):
     # --- Paramètres des deux études ---
     D_fixe   = 0.3
     a_values = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+    delta_V = a_values * b**2
 
     a_fixe   = 0.4
     D_values = np.array([0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6])
@@ -68,6 +69,36 @@ def run_eyring_analysis(gamma=1.0, b=1.2, n_traj=500, dt=0.005):
     slope1, intercept1 = np.polyfit(delta_V_barrier, log_t_barrier, 1)
     print(f"\n  Pente mesuree  : {slope1:.3f}")
     print(f"  Pente theorique 1/(D*gamma) = {1/(D_fixe*gamma):.3f}")
+        fpt = first_passage_times(n_traj, dt, D, gamma, a, b, seed=i)
+        mean_times.append(np.nanmean(fpt))
+
+    mean_times = np.array(mean_times)
+    log_t = np.log(mean_times)
+
+    # Fit lineaire ln<t> = alpha * DeltaV + cst
+    coeffs = np.polyfit(delta_V, log_t, 1)
+    slope, intercept = coeffs
+    print(f"\nPente mesuree : {slope:.4f}")
+    print(f"Pente theorique (Arrhenius) : 1/(D*gamma) = {1/(D*gamma):.4f}")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.plot(delta_V, log_t, 'o', ms=7, label="Simulation")
+    ax.plot(delta_V, np.polyval(coeffs, delta_V), '--', lw=2,
+            label=f"Fit : pente = {slope:.3f}\nThéorie : {1/(D*gamma):.3f}")
+    ax.set_xlabel(r"$\Delta V = a b^2$")
+    ax.set_ylabel(r"$\ln\langle t \rangle$")
+    ax.set_title(r"Loi d'Arrhenius : $\ln\langle t\rangle$ vs $\Delta V$ ($D$ fixé)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig("arrhenius_barrier.png", dpi=150)
+    plt.show()
+
+
+def run_eyring_D_analysis(a=0.4, gamma=1.0, b=1.2, n_traj=3000, dt=0.005):
+    """Fait varier D a barriere fixe."""
+    D_values = np.array([0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6])
+    delta_V = a * b**2
 
     # ---- Variation de D (barriere fixe) ----
     print("\n=== Variation de D (barriere fixe) ===")
