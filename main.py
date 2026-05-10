@@ -1,6 +1,10 @@
 from particule_libre import run_free_particle_analysis
 from force_exterieure import run_external_force_analysis
-from eyring import run_eyring_analysis
+from eyring import (
+	run_eyring_analysis,
+	run_eyring_barrier_analysis,
+	run_eyring_D_analysis,
+)
 from dynamique_2d import run_2d_analysis
 from dynamique_3d import run_3d_analysis
 from correlation_2d import plot_correlation_comparison
@@ -17,8 +21,7 @@ def main():
 	n_steps = 1000
 	dt = 0.01
 
-	"""print("Particule libre")
-	"""	print("Particule libre")
+	print("Particule libre")
 	run_free_particle_analysis(
 		D_values=D_values,
 		n_trajectories=n_trajectories,
@@ -33,18 +36,18 @@ def main():
 		n_steps=n_steps,
 		dt=dt,
 	)
-	"""
+	
 	print("\nTemps de franchissement - loi d'Arrhenius")
 	run_eyring_analysis()
 
 	run_eyring_barrier_analysis()
 	run_eyring_D_analysis()
-	"""
+	
 	print("\nDynamique en 2D")
 	run_2d_analysis(D=0.5, n_trajectories=10000, n_steps=1000, dt=0.01)
 
 	print("\nDynamique en 3D")
-	run_3d_analysis(D=0.5, n_trajectories=10000, n_steps=1000, dt=0.01)"""
+	run_3d_analysis(D=0.5, n_trajectories=10000, n_steps=1000, dt=0.01)
 
 	print("\nDynamique en 2D avec correlation")
 	plot_correlation_comparison(
@@ -61,9 +64,7 @@ def main():
 		dt=0.01, 
 		D=0.5
 	)
-
-	run_3d_analysis(D=0.5, n_trajectories=10000, n_steps=1000, dt=0.01)
-	"""
+	
 	print("\n" + "="*70)
 	print("PARTIE 3: Équation de Langevin avec Inertie")
 	print("="*70)
